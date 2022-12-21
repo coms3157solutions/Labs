@@ -1,0 +1,100 @@
+(a)
+
+$ make
+rm -rf a.out *.o hole copy copy-nobuf file-with-hole file-copied
+gcc -g -Wall -Wpedantic -std=c17    hole.c   -o hole
+gcc -g -Wall -Wpedantic -std=c17    copy.c   -o copy
+gcc -g -Wall -Wpedantic -std=c17    copy-nobuf.c   -o copy-nobuf
+
+$ ./hole
+
+$ ls -las
+total 362
+  9 drwx------ 2 j-hui j-hui      12 Oct 12 16:08 .
+  1 drwx------ 4 j-hui j-hui       5 Oct 12 16:05 ..
+  5 -rw------- 1 j-hui j-hui      48 Oct 12 16:08 .gitignore
+  5 -rw------- 1 j-hui j-hui     222 Oct 12 16:08 Makefile
+ 21 -rwx------ 1 j-hui j-hui   18808 Oct 12 16:08 copy
+ 21 -rwx------ 1 j-hui j-hui   18968 Oct 12 16:08 copy-nobuf
+  5 -rw------- 1 j-hui j-hui     372 Oct 12 16:05 copy-nobuf.c
+  5 -rw------- 1 j-hui j-hui     314 Oct 12 16:05 copy.c
+265 -rw------- 1 j-hui j-hui 1000001 Oct 12 16:08 file-with-hole
+ 21 -rwx------ 1 j-hui j-hui   18888 Oct 12 16:08 hole
+  5 -rw------- 1 j-hui j-hui     518 Oct 12 16:05 hole.c
+  5 -rw------- 1 j-hui j-hui    2238 Sep  8 23:08 results.txt
+
+$ od -c file-with-hole
+0000000   A  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000020  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+*
+3641100   Z
+3641101
+
+$ du -h file-with-hole
+265K    file-with-hole
+
+(b)
+
+$ ./copy < file-with-hole > file-copied
+
+$ ls -las
+total 363
+  9 drwx------ 2 j-hui j-hui      13 Oct 12 16:09 .
+  1 drwx------ 4 j-hui j-hui       5 Oct 12 16:05 ..
+  5 -rw------- 1 j-hui j-hui      48 Oct 12 16:08 .gitignore
+  5 -rw------- 1 j-hui j-hui     222 Oct 12 16:08 Makefile
+ 21 -rwx------ 1 j-hui j-hui   18808 Oct 12 16:08 copy
+ 21 -rwx------ 1 j-hui j-hui   18968 Oct 12 16:08 copy-nobuf
+  5 -rw------- 1 j-hui j-hui     372 Oct 12 16:05 copy-nobuf.c
+  5 -rw------- 1 j-hui j-hui     314 Oct 12 16:05 copy.c
+  1 -rw------- 1 j-hui j-hui 1000001 Oct 12 16:09 file-copied
+265 -rw------- 1 j-hui j-hui 1000001 Oct 12 16:08 file-with-hole
+ 21 -rwx------ 1 j-hui j-hui   18888 Oct 12 16:08 hole
+  5 -rw------- 1 j-hui j-hui     518 Oct 12 16:05 hole.c
+  5 -rw------- 1 j-hui j-hui    2238 Sep  8 23:08 results.txt
+
+
+$ du -h file-with-hole file-copied
+265K    file-with-hole
+1.1M    file-copied
+
+
+$ cmp file-with-hole file-copied        # (no output)
+
+(c)
+
+$ time ./copy < file-with-hole > file-copied
+
+real    0m0.029s
+user    0m0.013s
+sys     0m0.016s
+
+$ time ./copy < file-with-hole > file-copied
+
+real    0m0.030s
+user    0m0.017s
+sys     0m0.013s
+
+$ time ./copy < file-with-hole > file-copied
+
+real    0m0.028s
+user    0m0.028s
+sys     0m0.000s
+
+$ time ./copy-nobuf < file-with-hole > file-copied
+
+real    0m31.951s
+user    0m1.396s
+sys     0m30.542s
+
+$ time ./copy-nobuf < file-with-hole > file-copied
+
+real    0m33.161s
+user    0m1.408s
+sys     0m31.735s
+
+$ time ./copy-nobuf < file-with-hole > file-copied
+
+real    0m32.462s
+user    0m1.495s
+sys     0m30.958s
